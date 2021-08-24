@@ -1,49 +1,60 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import ContactItem from '../contact-item/ContactItem';
 import ContactForm from '../contact-form/ContactForm';
 
 import contactsService from '../../../services/contacts-service';
 
-class ContactList extends Component {
+function ContactList () {
 
-  state = {
-    contacts: [],
-    isLoading: true
-  }
+  const [contacts, setContacts] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
-  fetchContacts() {
+/*  CON DATA.JSON
+   useEffect(() => {
+    setContacts(contactsData)
+  }, []) */
+ 
+  useEffect(() => {
+    fetchContacts()
+  }, [])
+
+  function fetchContacts() {
     contactsService.list()
-      .then(contacts => this.setState({ contacts, isLoading: false }))
-      .catch(error => {
-        this.setState({ isLoading: false })
-        console.error(error)
-      });
+          .then(contacts => {
+            setContacts(contacts)
+          })
+          .catch(error => {
+            console.error(error)
+          }) 
   }
+ 
 
-  componentDidMount() {
-    this.fetchContacts();
-  }
-
-  handleDeleteContact(id) {
+  //ESTA ES LA MISMA FUNCIÓN QUE LA DE ABAJO//
+  //const handleDeleteContact = (id) => setContacts(contacts.filter(contact => contact.id !== id))
+  //Esta es con data.json
+  //function handleDeleteContact (id) {
+  //  setContacts(contacts.filter(contact => contact.id !== id))
+  //}
+  //Esta es con la API
+  function handleDeleteContact (id) {
     contactsService.remove(id)
-      .then(() => this.fetchContacts())
-      .catch(error => console.error(error));
+                  .then(() =>fetchContacts())
+                  .catch(error => console.error(error))
+    
   }
+//
 
-  handleCreateContact(contact) {
-    this.setState(({ contacts }) => ({
-      contacts: [contact, ...contacts]
-    }))
-  }
+function handleCreateContact(contact) {
+  setContacts([contact, ...contacts])
+}
 
-  render() {
-    const { contacts, isLoading } = this.state;
+ 
     return (
       contacts &&
         <>
           <div className="row mb-2">
             <div className="col">
-              <ContactForm onCreateContact={(contact) => this.handleCreateContact(contact)}/>
+              <ContactForm onCreateContact={(contact) => handleCreateContact(contact)}/>
             </div>
           </div>
           {isLoading ? (<i className="fa fa-gear fa-spin"></i>) : (
@@ -52,7 +63,7 @@ class ContactList extends Component {
                 <ul className="list-group">
                   {contacts.map(contact =>
                     <li key={contact.id} className="list-group-item list-group-item-action">
-                      <ContactItem {...contact} onDeleteContact={(id) => this.handleDeleteContact(id)} />
+                      <ContactItem {...contact} onDeleteContact={(id) => handleDeleteContact(id)} />
                     </li>
                   )}
                 </ul>
@@ -63,6 +74,6 @@ class ContactList extends Component {
     );
   }
 
-}
+
 
 export default ContactList;

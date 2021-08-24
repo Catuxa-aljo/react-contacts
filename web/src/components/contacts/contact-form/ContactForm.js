@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect, Component } from 'react';
 import faker from 'faker';
 
 import contactService from '../../../services/contacts-service';
@@ -33,6 +33,7 @@ const validations = {
 
 class ContactForm extends Component {
 
+    //const [contact, setUpdateContact] = useState({})
   state = this.initialState()
 
   initialState() {
